@@ -15,15 +15,19 @@ public class CountdownAsynchron {
                 System.out.println("Bitte Befehl eingeben: set {Zahl}, cancel, status");
                 String input = scanner.nextLine();
 
-                if (input.startsWith("set")) {
-                    int value = Integer.parseInt(input.split(" ")[1]);
-                    setCountdown(value);
-                    System.out.println("Countdown wurde auf " + value + " Sekunden gesetzt.");
-                } else if (input.equals("cancel")) {
-                    cancelCountdown();
-                    System.out.println("Countdown wurde abgebrochen.");
-                } else if (input.equals("status")) {
-                    System.out.println("Countdown in Sekunden: " + getCountdown());
+                if(userinputIsCorrect(input)) {
+                    if (input.startsWith("set")) {
+                        int value = Integer.parseInt(input.split(" ")[1]);
+                        setCountdown(value);
+                        System.out.println("Countdown wurde auf " + value + " Sekunden gesetzt.");
+                    } else if (input.equals("cancel")) {
+                        cancelCountdown();
+                        System.out.println("Countdown wurde abgebrochen.");
+                    } else if (input.equals("status")) {
+                        System.out.println("Countdown in Sekunden: " + getCountdown());
+                    }
+                } else {
+                    System.out.println("Falsche Nutzereingabe. Erneut veruschen..");
                 }
             }
         }, executorService);
@@ -67,5 +71,10 @@ public class CountdownAsynchron {
 
     private static int getCountdown() {
         return countdownTimeInSeconds;
+    }
+
+    private static boolean userinputIsCorrect(String input) {
+        String regex = "(cancel|status|set\\s+-?[0-8]?\\d{0,8})";
+        return input.matches(regex);
     }
 }

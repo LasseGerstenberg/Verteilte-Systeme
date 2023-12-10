@@ -1,6 +1,6 @@
 import java.util.Scanner;
 
-public class Countdown extends Thread {
+public class CountdownSynchron extends Thread {
 
     private static boolean isCountdownRunning = true;
     private static int countdownTimeInSeconds = 20;
@@ -57,15 +57,15 @@ public class Countdown extends Thread {
         }
 
     }
-    private static void setCountdown(int value) {
+    private synchronized static void setCountdown(int value) {
         countdownTimeInSeconds = value;
     }
 
-    private static void cancelCountdown() {
+    private synchronized static void cancelCountdown() {
         isCountdownRunning = false;
     }
 
-    private static int getCountdown() {
+    private synchronized static int getCountdown() {
         return countdownTimeInSeconds;
     }
 }

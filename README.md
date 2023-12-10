@@ -1,5 +1,5 @@
 # Verteilte Systeme
- Aufgabe Verteilte Systeme - Synchron vs Asynchron
+Aufgabe Verteilte Systeme - Synchron vs Asynchron
 
 Lasse Gerstenberg & Nik Kazemifard
 

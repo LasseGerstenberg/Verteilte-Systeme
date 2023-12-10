@@ -1,0 +1,27 @@
+# Compiled class files
+*.class
+
+# Log files
+*.log
+
+# Compiled bytecode
+*.jar
+
+# IntelliJ specific files
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Logs
+log/
+logs/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

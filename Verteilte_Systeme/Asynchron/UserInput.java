@@ -48,10 +48,9 @@ public class UserInput extends Thread {
             List<String> list = new ArrayList<>();
             countdownToUserInputQueue.drainTo(list);
 
-            // Retrieve the last element
             if (!list.isEmpty()) {
                 int lastElement = Integer.parseInt(list.get(list.size() - 1));
-                System.out.println("Last element: " + lastElement);
+                System.out.println("Aktueller Zaehlerstand: " + lastElement);
             }
         }
     }

@@ -1,10 +1,9 @@
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class Main {
     public static void main(String[] args) {
-        BlockingQueue<String> userInputToCountdownQueue = new LinkedBlockingQueue<>();
-        BlockingQueue<String> countdownToUserInputQueue = new LinkedBlockingQueue<>();
+        ConcurrentLinkedQueue<String> userInputToCountdownQueue = new ConcurrentLinkedQueue<>();
+        ConcurrentLinkedQueue<String> countdownToUserInputQueue = new ConcurrentLinkedQueue<>();
 
         Countdown countdown = new Countdown(countdownToUserInputQueue, userInputToCountdownQueue);
         UserInput userInput = new UserInput(countdownToUserInputQueue, userInputToCountdownQueue);

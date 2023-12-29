@@ -1,13 +1,13 @@
-import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
 public class Countdown extends Thread {
     private boolean stopThread = false;
     private int timeInSeconds = 100;
-    private final BlockingQueue<String> countdownToUserInputQueue;
-    private final BlockingQueue<String> userInputToCountdownQueue;
+    private final ConcurrentLinkedQueue<String> countdownToUserInputQueue;
+    private final ConcurrentLinkedQueue<String> userInputToCountdownQueue;
 
-    public Countdown(BlockingQueue<String> countdownToUserInputQueue, BlockingQueue<String> userInputToCountdownQueue) {
+    public Countdown(ConcurrentLinkedQueue<String> countdownToUserInputQueue, ConcurrentLinkedQueue<String> userInputToCountdownQueue) {
         this.countdownToUserInputQueue = countdownToUserInputQueue;
         this.userInputToCountdownQueue = userInputToCountdownQueue;
     }
@@ -25,12 +25,11 @@ public class Countdown extends Thread {
             }
         }
         countdownToUserInputQueue.offer("canceled");
-        System.out.println("Countdown beendet!");
     }
 
     private void pollUserInputToCountdownQueue() {
-        String userInputQueueElement = userInputToCountdownQueue.poll();
-        if(userInputQueueElement != null) {
+        String userInputQueueElement;
+        while ((userInputQueueElement = userInputToCountdownQueue.poll()) != null) {
             if(userInputQueueElement.startsWith("set")) {
                 String[] splitString = userInputQueueElement.split(" ");
                 timeInSeconds = Integer.parseInt(splitString[1]);
@@ -41,5 +40,4 @@ public class Countdown extends Thread {
             }
         }
     }
-
 }

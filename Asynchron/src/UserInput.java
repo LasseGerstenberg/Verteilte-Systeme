@@ -1,16 +1,14 @@
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
-import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.TimeUnit;
 
 public class UserInput extends Thread {
 
     private boolean stopThread = false;
-    private final BlockingQueue<String> countdownToUserInputQueue;
-    private final BlockingQueue<String> userInputToCountdownQueue;
+    private final ConcurrentLinkedQueue<String> countdownToUserInputQueue;
+    private final ConcurrentLinkedQueue<String> userInputToCountdownQueue;
 
-    public UserInput(BlockingQueue<String> countdownToUserInputQueue, BlockingQueue<String> userInputToCountdownQueue) {
+    public UserInput(ConcurrentLinkedQueue<String> countdownToUserInputQueue, ConcurrentLinkedQueue<String> userInputToCountdownQueue) {
         this.countdownToUserInputQueue = countdownToUserInputQueue;
         this.userInputToCountdownQueue = userInputToCountdownQueue;
     }
@@ -38,19 +36,18 @@ public class UserInput extends Thread {
             }
             pollCountdownToUserInputQueue();
         }
+        System.out.println("Der Countdown wurde beendet!");
         scanner.close();
     }
 
     private void pollCountdownToUserInputQueue() {
-        if (countdownToUserInputQueue.contains("canceled")) {
-            stopThread = true;
-        } else {
-            List<String> list = new ArrayList<>();
-            countdownToUserInputQueue.drainTo(list);
-
-            if (!list.isEmpty()) {
-                int lastElement = Integer.parseInt(list.get(list.size() - 1));
-                System.out.println("Aktueller Zaehlerstand: " + lastElement);
+        String message;
+        while ((message = countdownToUserInputQueue.poll()) != null) {
+            if (message.equals("canceled")) {
+                stopThread = true;
+                break;
+            } else {
+                System.out.println("Aktueller Zaehlerstand: " + message);
             }
         }
     }

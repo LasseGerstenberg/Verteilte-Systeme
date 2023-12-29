@@ -1,15 +1,16 @@
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.TimeUnit;
+import java.io.IOException;
 
 public class Main {
-    public static void main(String[] args) {
-        LinkedBlockingQueue<String> userInputToCountdownQueue = new LinkedBlockingQueue<>();
-        LinkedBlockingQueue<String> countdownToUserInputQueue = new LinkedBlockingQueue<>();
+    public static void main(String[] args) throws IOException {
+        try {
+            int port = 5000;
+            Countdown serverThread = new Countdown(port);
+            UserInput clientThread = new UserInput("127.0.0.1", port);
 
-        Countdown countdown = new Countdown(countdownToUserInputQueue, userInputToCountdownQueue);
-        UserInput userInput = new UserInput(countdownToUserInputQueue, userInputToCountdownQueue);
-
-        userInput.start();
-        countdown.start();
+            serverThread.start();
+            clientThread.start();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

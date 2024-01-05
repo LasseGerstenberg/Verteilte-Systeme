@@ -1,17 +1,15 @@
 import java.io.*;
 import java.net.*;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class UserInput extends Thread {
     private Socket socket;
-    private PrintWriter out;
-    private BufferedReader in;
+    private PrintWriter userInputToCountdownStream;
+    private BufferedReader countdownToUserInputStream;
     private String address;
     private int port;
 
-    // A queue to hold the commands
-    private LinkedBlockingQueue<String> commandQueue = new LinkedBlockingQueue<>();
-
+    private final ConcurrentLinkedQueue<String> inputQueue = new ConcurrentLinkedQueue<>();
     public UserInput(String address, int port) {
         this.address = address;
         this.port = port;
@@ -20,49 +18,55 @@ public class UserInput extends Thread {
     public void run() {
         try {
             socket = new Socket(address, port);
-            out = new PrintWriter(socket.getOutputStream(), true);
-            in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            userInputToCountdownStream = new PrintWriter(socket.getOutputStream(), true);
+            countdownToUserInputStream = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 
-            // Start a new thread for reading user input
+            // Thread, der Input vom User liest
             Thread inputThread = new Thread(() -> {
                 try {
                     BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
                     String userInput;
                     while (true) {
-                        System.out.println("Enter command (set X/cancel/remaining):");
+                        System.out.println("Befehl eingeben: (set X/cancel/remaining):");
                         userInput = stdIn.readLine();
-                        commandQueue.put(userInput); // Store command in the queue
+                        inputQueue.offer(userInput); // Userinput in Queue packen, die vom Main-Thread gelesen wird
                     }
-                } catch (IOException | InterruptedException e) {
+                } catch (IOException e) {
                     e.printStackTrace();
                 }
             });
-
             inputThread.start();
 
-            // Main thread handles sending commands and server responses
+            // Main-Thread: Sendet Userinput an den Countdown und empfängt Antworten/Nachrichten  vom Countdown
             try {
                 while (true) {
-                    String commandToSend = commandQueue.take(); // Take the next command from the queue
-                    out.println(commandToSend); // Send it to the server
+                    //Senden und Warten auf Antwort, falls Userinput vorliegt
+                    String userInput = (String) inputQueue.poll(); //Lesen der Queue, welche vom Userinput-Thread befüllt wird. Poll ist nicht blockierend
+                    if(userInput != null) {
+                        userInputToCountdownStream.println(userInput); // Senden
+                        String response = countdownToUserInputStream.readLine(); // Antwort lesen, readLine() ist blockierend
+                        if (response != null) {
+                            handleResponse(response);
+                        }
+                    }
 
-                    // Wait for server response
-                    String response = in.readLine();
-                    if (response != null) {
-                        handleResponse(response);
-                    } else {
-                        break; // Exit if the server closes the connection
+                    // Prüfen, ob Countdown Ende des Countdowns mitteilt
+                    if(countdownToUserInputStream.ready()) {
+                        String response = countdownToUserInputStream.readLine();
+                        if (response != null) {
+                            handleResponse(response);
+                        }
                     }
                 }
-            } catch (InterruptedException | IOException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
             }
         } catch (IOException e) {
             e.printStackTrace();
         } finally {
             try {
-                if (in != null) in.close();
-                if (out != null) out.close();
+                if (countdownToUserInputStream != null) countdownToUserInputStream.close();
+                if (userInputToCountdownStream != null) userInputToCountdownStream.close();
                 if (socket != null) socket.close();
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -74,12 +78,12 @@ public class UserInput extends Thread {
         if (response.equals("canceled")) {
             stopExecution();
         } else {
-            System.out.println("Server response: " + response);
+            System.out.println("Antwort des Countdowns: " + response);
         }
     }
 
     private void stopExecution() {
-        System.out.println("The Countdown finished!");
-        System.exit(1);
+        System.out.println("Der Countdown wurde beendet!");
+        System.exit(0);
     }
 }

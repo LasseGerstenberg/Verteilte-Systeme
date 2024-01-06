@@ -1,12 +1,14 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Scanner;
 import java.util.concurrent.*;
 
 public class UserInput extends Thread {
 
-    private volatile boolean stopThread = false;
+    private boolean stopThread = false;
     private final ConcurrentLinkedQueue<String> countdownToUserInputQueue;
     private final ConcurrentLinkedQueue<String> userInputToCountdownQueue;
-    private final ExecutorService executorService = Executors.newSingleThreadExecutor();
 
     public UserInput(ConcurrentLinkedQueue<String> countdownToUserInputQueue, ConcurrentLinkedQueue<String> userInputToCountdownQueue) {
         this.countdownToUserInputQueue = countdownToUserInputQueue;
@@ -14,31 +16,35 @@ public class UserInput extends Thread {
     }
 
     public void run() {
-        Runnable userInputTask = () -> {
-            Scanner scanner = new Scanner(System.in);
-            while (!stopThread) {
-                System.out.println("Enter command (set X/cancel/remaining):");
-                String command = scanner.nextLine();
-                processCommand(command);
-            }
-            scanner.close();
-        };
 
-        executorService.submit(userInputTask);
+        // Thread für Userinput
+        Thread inputThread = new Thread(() -> {
+                Scanner scanner = new Scanner(System.in);
+                while (!stopThread) {
+                    System.out.println("Enter command (set X/cancel/remaining):");
+                    String command = scanner.nextLine();
+                    processCommand(command);
+                }
+                scanner.close();
+        });
+        inputThread.start();
 
+        // Haupthread der horcht, ob es Nachrichten vom Countdown gibt. Verarbeitet diese ggf.
         while (!stopThread) {
-            pollCountdownToUserInputQueue();
-            try {
-                TimeUnit.SECONDS.sleep(1);
-            } catch (InterruptedException e) {
-                Thread.currentThread().interrupt();
+            if(!countdownToUserInputQueue.isEmpty()) {
+                String messageFromCountdown = countdownToUserInputQueue.poll();
+                if(messageFromCountdown.equals("canceled")) {
+                    System.out.println("Der Countdown wurde beendet");
+                    System.exit(0);
+                } else {
+                    System.out.println(messageFromCountdown);
+                }
             }
+
         }
-        executorService.shutdownNow();
-        System.out.println("Der Countdown wurde beendet!");
-        System.exit(0);
     }
 
+    //Verarbeitung der Befehle, die durch die Nutzeringabe getaetigt werden
     private void processCommand(String command) {
         if (!command.isEmpty()) {
             if (command.startsWith("set")) {
@@ -51,15 +57,4 @@ public class UserInput extends Thread {
         }
     }
 
-    private void pollCountdownToUserInputQueue() {
-        String message;
-        while ((message = countdownToUserInputQueue.poll()) != null) {
-            if (message.equals("canceled")) {
-                stopThread = true;
-                break;
-            } else {
-                System.out.println("Aktueller Zaehlerstand: " + message);
-            }
-        }
-    }
 }

@@ -37,11 +37,11 @@ public class UserInput extends Thread {
             });
             inputThread.start();
 
-            // Main-Thread: Sendet Userinput an den Countdown und empfängt Antworten/Nachrichten  vom Countdown
+            // Main-Thread: Sendet Userinput an den Countdown und empfaengt Antworten/Nachrichten  vom Countdown
             try {
                 while (true) {
                     //Senden und Warten auf Antwort, falls Userinput vorliegt
-                    String userInput = (String) inputQueue.poll(); //Lesen der Queue, welche vom Userinput-Thread befüllt wird. Poll ist nicht blockierend
+                    String userInput = (String) inputQueue.poll(); //Lesen der Queue, welche vom Userinput-Thread befuellt wird. Poll ist nicht blockierend
                     if(userInput != null) {
                         userInputToCountdownStream.println(userInput); // Senden
                         String response = countdownToUserInputStream.readLine(); // Antwort lesen, readLine() ist blockierend
@@ -50,7 +50,7 @@ public class UserInput extends Thread {
                         }
                     }
 
-                    // Prüfen, ob Countdown Ende des Countdowns mitteilt
+                    // Pruefen, ob Countdown Ende des Countdowns mitteilt
                     if(countdownToUserInputStream.ready()) {
                         String response = countdownToUserInputStream.readLine();
                         if (response != null) {

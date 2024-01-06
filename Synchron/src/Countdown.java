@@ -24,7 +24,7 @@ public class Countdown extends Thread {
 
             String inputLine;
 
-            //Schleife läuft, solange der Countdown läuft
+            //Schleife laeuft, solange der Countdown laeuft
             while (remainingCountdown > 0) {
                 TimeUnit.SECONDS.sleep(1);
                 remainingCountdown--;
@@ -42,7 +42,7 @@ public class Countdown extends Thread {
                     }
                 }
             }
-            // wird ausgeführt, wenn der Countdown beendet ist
+            // wird ausgefuehrt, wenn der Countdown beendet ist
             String cancelMessage = canceledByUser ? "canceledByUser" : "canceledByTimer";
             countdownToUserInputStream.println(cancelMessage);
             if(canceledByUser) {

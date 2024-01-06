@@ -10,6 +10,8 @@ public class Countdown extends Thread {
 
     private int remainingCountdown = 1000;
 
+    private boolean canceledByUser = false;
+
     public Countdown(int port) throws IOException {
         serverSocket = new ServerSocket(port);
     }
@@ -35,12 +37,20 @@ public class Countdown extends Thread {
                         remainingCountdown = Integer.parseInt(splitString[1]);
                         countdownToUserInputStream.println("Setze Countdown auf " + String.valueOf(remainingCountdown) + " Sekunden");
                     } else if(inputLine.equals("cancel")) {
+                        canceledByUser = true;
                         remainingCountdown = 0;
                     }
                 }
             }
             // wird ausgeführt, wenn der Countdown beendet ist
-            countdownToUserInputStream.println("canceled");
+            String cancelMessage = canceledByUser ? "canceledByUser" : "canceledByTimer";
+            countdownToUserInputStream.println(cancelMessage);
+            if(canceledByUser) {
+                countdownToUserInputStream.println("canceledByUser");
+            } else {
+                countdownToUserInputStream.println("canceledByTimer");
+                if(userInputToCountdownStream.readLine().equals("ok")) System.exit(0);
+            }
         } catch (IOException | InterruptedException e) {
             e.printStackTrace();
         } finally {

@@ -46,7 +46,7 @@ public class UserInput extends Thread {
                         userInputToCountdownStream.println(userInput); // Senden
                         String response = countdownToUserInputStream.readLine(); // Antwort lesen, readLine() ist blockierend
                         if (response != null) {
-                            handleResponse(response);
+                            handleMessageFromCountdown(response);
                         }
                     }
 
@@ -54,7 +54,7 @@ public class UserInput extends Thread {
                     if(countdownToUserInputStream.ready()) {
                         String response = countdownToUserInputStream.readLine();
                         if (response != null) {
-                            handleResponse(response);
+                            handleMessageFromCountdown(response);
                         }
                     }
                 }
@@ -74,16 +74,16 @@ public class UserInput extends Thread {
         }
     }
 
-    private void handleResponse(String response) {
-        if (response.equals("canceled")) {
-            stopExecution();
+    private void handleMessageFromCountdown(String response) {
+        String endOfCountdownMessage = "Der Countdown wurde beendet!";
+        if (response.equals("canceledByUser")) {
+            System.out.println(endOfCountdownMessage);
+            System.exit(0);
+        } else if (response.equals("canceledByTimer")){
+            userInputToCountdownStream.println("ok");
+            System.out.println(endOfCountdownMessage);
         } else {
             System.out.println("Antwort des Countdowns: " + response);
         }
-    }
-
-    private void stopExecution() {
-        System.out.println("Der Countdown wurde beendet!");
-        System.exit(0);
     }
 }

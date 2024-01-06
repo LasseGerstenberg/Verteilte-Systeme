@@ -4,6 +4,8 @@ import java.util.concurrent.TimeUnit;
 public class Countdown extends Thread {
     private boolean stopThread = false;
     private int remainingCountdown = 100;
+
+    // ConcurrentQueues ermoeglichen asynchrone Kommunikation zwischen den Klassen. offer() und poll () sind nicht blockend
     private final ConcurrentLinkedQueue<String> countdownToUserInputQueue;
     private final ConcurrentLinkedQueue<String> userInputToCountdownQueue;
 
@@ -17,11 +19,11 @@ public class Countdown extends Thread {
         while (remainingCountdown > 0 && !stopThread) {
             pollUserInputToCountdownQueue();
             try {
-                TimeUnit.SECONDS.sleep(1);
+                TimeUnit.SECONDS.sleep(1); // 1 Sekunde warten
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
-            remainingCountdown--;
+            remainingCountdown--; // Timer dekrementieren
             if(remainingCountdown <= 0) break;
         }
         //wird ausgefuehrt, wenn die Schleife beendet ist -> Countdown < 0 oder stopThread = true

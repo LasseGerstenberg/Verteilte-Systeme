@@ -7,6 +7,8 @@ import java.util.concurrent.*;
 public class UserInput extends Thread {
 
     private boolean stopThread = false;
+
+    // ConcurrentQueues ermoeglichen asynchrone Kommunikation zwischen den Klassen. offer() und poll () sind nicht blockend
     private final ConcurrentLinkedQueue<String> countdownToUserInputQueue;
     private final ConcurrentLinkedQueue<String> userInputToCountdownQueue;
 

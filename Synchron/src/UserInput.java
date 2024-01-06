@@ -24,11 +24,11 @@ public class UserInput extends Thread {
             // Thread, der Input vom User liest
             Thread inputThread = new Thread(() -> {
                 try {
-                    BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
+                    BufferedReader readUserInput = new BufferedReader(new InputStreamReader(System.in));
                     String userInput;
                     while (true) {
                         System.out.println("Befehl eingeben: (set X/cancel/remaining):");
-                        userInput = stdIn.readLine();
+                        userInput = readUserInput.readLine();
                         inputQueue.offer(userInput); // Userinput in Queue packen, die vom Main-Thread gelesen wird
                     }
                 } catch (IOException e) {

@@ -44,11 +44,10 @@ public class Countdown extends Thread {
             }
             // wird ausgefuehrt, wenn der Countdown beendet ist
             String cancelMessage = canceledByUser ? "canceledByUser" : "canceledByTimer";
-            countdownToUserInputStream.println(cancelMessage);
-            if(canceledByUser) {
-                countdownToUserInputStream.println("canceledByUser");
-            } else {
-                countdownToUserInputStream.println("canceledByTimer");
+            if(canceledByUser) { // Beendet vom User
+                countdownToUserInputStream.println(cancelMessage);
+            } else { // Beendet vom Timer
+                countdownToUserInputStream.println(cancelMessage);
                 if(userInputToCountdownStream.readLine().equals("ok")) System.exit(0);
             }
         } catch (IOException | InterruptedException e) {

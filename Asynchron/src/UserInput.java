@@ -25,7 +25,9 @@ public class UserInput extends Thread {
                 while (!stopThread) {
                     System.out.println("Enter command (set X/cancel/remaining):");
                     String command = scanner.nextLine();
-                    processCommand(command);
+                    if(!command.isEmpty()) {
+                        userInputToCountdownQueue.offer(command);
+                    }
                 }
                 scanner.close();
         });
@@ -45,18 +47,4 @@ public class UserInput extends Thread {
 
         }
     }
-
-    //Verarbeitung der Befehle, die durch die Nutzeringabe getaetigt werden
-    private void processCommand(String command) {
-        if (!command.isEmpty()) {
-            if (command.startsWith("set")) {
-                userInputToCountdownQueue.offer(command);
-            } else if (command.equals("cancel")) {
-                userInputToCountdownQueue.offer("cancel");
-            } else if (command.equals("remaining")) {
-                userInputToCountdownQueue.offer("remaining");
-            }
-        }
-    }
-
 }
